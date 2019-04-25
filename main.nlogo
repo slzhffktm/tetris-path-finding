@@ -4,6 +4,7 @@ l-shapes-own[group]
 
 to reset
   clear-all
+  set next-turtle-group 1
   reset-ticks
 end
 
@@ -29,7 +30,6 @@ end
 
 to init-shapes
   let num 4
-  set next-turtle-group 1
   while [num > 0] [
    draw-shape
    set num (num - 1)
