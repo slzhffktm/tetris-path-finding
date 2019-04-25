@@ -1,6 +1,6 @@
-globals [is-drawing goal-x goal-y next-turtle-color next-turtle-x next-turtle-y]
+globals [is-drawing goal-x goal-y next-turtle-color next-turtle-x next-turtle-y next-turtle-group]
 breed [l-shapes l-shape]
-l-shapes-own[rotation]
+l-shapes-own[group]
 
 to reset
   clear-all
@@ -29,9 +29,11 @@ end
 
 to init-shapes
   let num 4
+  set next-turtle-group 1
   while [num > 0] [
    draw-shape
    set num (num - 1)
+   set next-turtle-group (next-turtle-group + 1)
   ]
 end
 
@@ -45,28 +47,32 @@ to draw-shape
     set next-turtle-y random-ycor
   ]
   set next-turtle-color random 140
-  create-turtles 1 [
+  create-l-shapes 1 [
+    set group next-turtle-group
     set xcor next-turtle-x
     set ycor next-turtle-y
     set color next-turtle-color
     set shape "square"
   ]
 
-  create-turtles 1 [
+  create-l-shapes 1 [
+    set group next-turtle-group
     set xcor next-turtle-x + 1
     set ycor next-turtle-y
     set color next-turtle-color
     set shape "square"
   ]
 
-  create-turtles 1 [
+  create-l-shapes 1 [
+    set group next-turtle-group
     set xcor next-turtle-x - 1
     set ycor next-turtle-y
     set color next-turtle-color
     set shape "square"
   ]
 
-  create-turtles 1 [
+  create-l-shapes 1 [
+    set group next-turtle-group
     set xcor next-turtle-x - 1
     set ycor next-turtle-y - 1
     set color next-turtle-color
