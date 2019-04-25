@@ -1,16 +1,19 @@
-globals [is-drawing goal-x goal-y]
+globals [is-drawing goal-x goal-y next-turtle-color next-turtle-x next-turtle-y]
+breed [l-shapes l-shape]
+l-shapes-own[rotation]
+
 to reset
   clear-all
   reset-ticks
 end
 
-to drawing
+to draw-block
   if mouse-inside? and mouse-down? [
     ask patch mouse-xcor mouse-ycor [set pcolor white]
   ]
 end
 
-to erasing
+to erase
   if mouse-inside? and mouse-down? [
     ask patch mouse-xcor mouse-ycor [set pcolor black]
   ]
@@ -21,6 +24,53 @@ to set-goal
    set goal-x mouse-xcor
    set goal-y mouse-ycor
     ask patch goal-x goal-y [set pcolor red]
+  ]
+end
+
+to init-shapes
+  let num 4
+  while [num > 0] [
+   draw-shape
+   set num (num - 1)
+  ]
+end
+
+to draw-shape
+  set next-turtle-x random-xcor
+  while [next-turtle-x < (min-pxcor + 1) or next-turtle-x > (max-pxcor - 1)] [
+    set next-turtle-x random-xcor
+  ]
+  set next-turtle-y random-ycor
+  while [next-turtle-y < (min-pycor + 1) or next-turtle-y > (max-pycor)] [
+    set next-turtle-y random-ycor
+  ]
+  set next-turtle-color random 140
+  create-turtles 1 [
+    set xcor next-turtle-x
+    set ycor next-turtle-y
+    set color next-turtle-color
+    set shape "square"
+  ]
+
+  create-turtles 1 [
+    set xcor next-turtle-x + 1
+    set ycor next-turtle-y
+    set color next-turtle-color
+    set shape "square"
+  ]
+
+  create-turtles 1 [
+    set xcor next-turtle-x - 1
+    set ycor next-turtle-y
+    set color next-turtle-color
+    set shape "square"
+  ]
+
+  create-turtles 1 [
+    set xcor next-turtle-x - 1
+    set ycor next-turtle-y - 1
+    set color next-turtle-color
+    set shape "square"
   ]
 end
 @#$#@#$#@
@@ -74,7 +124,7 @@ BUTTON
 99
 89
 draw
-drawing
+draw-block
 T
 1
 T
@@ -91,7 +141,7 @@ BUTTON
 84
 134
 erase
-erasing
+erase
 T
 1
 T
@@ -110,6 +160,23 @@ BUTTON
 NIL
 set-goal
 T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+16
+194
+113
+227
+NIL
+init-shapes
+NIL
 1
 T
 OBSERVER
