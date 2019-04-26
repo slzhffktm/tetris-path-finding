@@ -1,4 +1,4 @@
-globals [is-drawing goal-x goal-y next-turtle-color next-turtle-x next-turtle-y next-turtle-group]
+globals [is-drawing goal-x goal-y next-turtle-color next-turtle-x next-turtle-y next-turtle-group open closed optimal-path global-destination next-move-patch]
 breed [l-shapes l-shape]
 l-shapes-own[group path current-path]
 patches-own [parent f g h]
@@ -7,6 +7,11 @@ to reset
   clear-all
   set next-turtle-group 1
   reset-ticks
+end
+
+to go
+  move
+  tick
 end
 
 to draw-block
@@ -54,6 +59,7 @@ to draw-shape
     set ycor next-turtle-y
     set color next-turtle-color
     set shape "square"
+    set current-path find-a-path patch xcor ycor patch goal-x goal-y
   ]
 
   create-l-shapes 1 [
@@ -81,6 +87,80 @@ to draw-shape
   ]
 end
 
+to move
+  ask l-shapes with [who mod 4 = 0 and group = 1]
+  [
+    if length current-path != 0
+    [
+      move-to first current-path
+      set current-path remove-item 0 current-path
+      set next-move-patch patch-at 1 0
+      ask l-shapes with [who mod 4 = 1 and group = 1]
+      [move-to next-move-patch]
+      set next-move-patch patch-at -1 0
+      ask l-shapes with [who mod 4 = 2 and group = 1]
+      [move-to next-move-patch]
+      set next-move-patch patch-at -1 -1
+      ask l-shapes with [who mod 4 = 3 and group = 1]
+      [move-to next-move-patch]
+    ]
+  ]
+
+  ask l-shapes with [who mod 4 = 0 and group = 2]
+  [
+    if length current-path != 0
+    [
+      move-to first current-path
+      set current-path remove-item 0 current-path
+      set next-move-patch patch-at 1 0
+      ask l-shapes with [who mod 4 = 1 and group = 2]
+      [move-to next-move-patch]
+      set next-move-patch patch-at -1 0
+      ask l-shapes with [who mod 4 = 2 and group = 2]
+      [move-to next-move-patch]
+      set next-move-patch patch-at -1 -1
+      ask l-shapes with [who mod 4 = 3 and group = 2]
+      [move-to next-move-patch]
+    ]
+  ]
+
+  ask l-shapes with [who mod 4 = 0 and group = 3]
+  [
+    if length current-path != 0
+    [
+      move-to first current-path
+      set current-path remove-item 0 current-path
+      set next-move-patch patch-at 1 0
+      ask l-shapes with [who mod 4 = 1 and group = 3]
+      [move-to next-move-patch]
+      set next-move-patch patch-at -1 0
+      ask l-shapes with [who mod 4 = 2 and group = 3]
+      [move-to next-move-patch]
+      set next-move-patch patch-at -1 -1
+      ask l-shapes with [who mod 4 = 3 and group = 3]
+      [move-to next-move-patch]
+    ]
+  ]
+
+  ask l-shapes with [who mod 4 = 0 and group = 4]
+  [
+    if length current-path != 0
+    [
+      move-to first current-path
+      set current-path remove-item 0 current-path
+      set next-move-patch patch-at 1 0
+      ask l-shapes with [who mod 4 = 1 and group = 4]
+      [move-to next-move-patch]
+      set next-move-patch patch-at -1 0
+      ask l-shapes with [who mod 4 = 2 and group = 4]
+      [move-to next-move-patch]
+      set next-move-patch patch-at -1 -1
+      ask l-shapes with [who mod 4 = 3 and group = 4]
+      [move-to next-move-patch]
+    ]
+  ]
+end
+
 to-report find-a-path [ source-patch destination-patch ]
   let search-done? false
   let search-path []
@@ -92,8 +172,64 @@ to-report find-a-path [ source-patch destination-patch ]
 
   while [ search-done? != true ]
   [
+    ifelse length open != 0
+    [
+      set open sort-by [[a b] -> [f] of a < [f] of b] open
 
+      set current-patch item 0 open
+      set open remove-item 0 open
+
+      set closed lput current-patch closed
+
+      ask current-patch
+      [
+        ifelse any? neighbors4 with [pcolor = red]
+        [
+          set search-done? true
+        ]
+        [
+          ask neighbors4 with [ pcolor = black and (not member? self closed) and (self != parent) and moveable]
+          [
+            if not member? self open and self != source-patch and self != destination-patch
+            [
+              set open lput self open
+
+              set parent current-patch
+              set g [g] of parent + 1
+              set h distance destination-patch
+              set f (g + h)
+            ]
+          ]
+        ]
+      ]
+    ]
+    [
+      user-message("A path does not exist.")
+      report []
+    ]
   ]
+
+  set search-path lput current-patch search-path
+
+  let temp first search-path
+  while [temp != source-patch]
+  [
+    set search-path lput [parent] of temp search-path
+    set temp [parent] of temp
+  ]
+
+  set search-path fput destination-patch search-path
+
+  set search-path reverse search-path
+
+  report search-path
+end
+
+to-report moveable
+  if [pcolor] of patch-at 1 0 = white [report false]
+  if [pcolor] of patch-at -1 0 = white [report false]
+  if [pcolor] of patch-at -1 -1 = white [report false]
+  report true
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -117,8 +253,8 @@ GRAPHICS-WINDOW
 16
 -16
 16
-0
-0
+1
+1
 1
 ticks
 30.0
@@ -199,6 +335,23 @@ BUTTON
 NIL
 init-shapes
 NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+25
+242
+88
+275
+NIL
+go
+T
 1
 T
 OBSERVER
