@@ -1,6 +1,7 @@
 globals [is-drawing goal-x goal-y next-turtle-color next-turtle-x next-turtle-y next-turtle-group]
 breed [l-shapes l-shape]
-l-shapes-own[group]
+l-shapes-own[group path current-path]
+patches-own [parent f g h]
 
 to reset
   clear-all
@@ -77,6 +78,21 @@ to draw-shape
     set ycor next-turtle-y - 1
     set color next-turtle-color
     set shape "square"
+  ]
+end
+
+to-report find-a-path [ source-patch destination-patch ]
+  let search-done? false
+  let search-path []
+  let current-patch 0
+  set open []
+  set closed []
+
+  set open lput source-patch open
+
+  while [ search-done? != true ]
+  [
+
   ]
 end
 @#$#@#$#@
